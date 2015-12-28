@@ -2,3 +2,6 @@ articles.obj
 output.txt
 *.pyc
 *.html
+.idea/*
+cookie.txt
+*.iml
