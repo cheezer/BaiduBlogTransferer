@@ -41,18 +41,34 @@ def access1():
 if __name__ == "__main__":
     #url="http://wenzhang.baidu.com/page/view?key=168a2f0785435838-1426607065"
     writerList = open("output.txt", "w")
+    #urls = ["http://wenzhang.baidu.com/page/view?key=168a2f0785435838-1426607065"]
+    urls = getArticleList()
     articles = []
-    for url in getArticleList():
+    for url in urls:
         s = requests.Session()
         cookies = pyCookieCheat.chrome_cookies(url)
-        res = s.get(url, cookies = cookies)
+        res = s.get(url, cookies=cookies)
+        #print res.raw.read(100000).decode("ISO-8859-1").encode("utf-8")
+        #print res.encoding
         res.encoding = "utf-8"
-        #print res.text
         soup = BeautifulSoup(res.text, 'html.parser')
-        content = soup.find("meta", {"name":"description"})["content"]
+        #print soup.prettify()
+        res2 = s.get(soup.body.iframe["src"], cookies = cookies)
+        res2.encoding = "utf-8"
+        soup2 = BeautifulSoup(res2.text, "html.parser")
+        #print soup2.prettify()
+        tags = soup2.body.div.find_all("p")
+        content = ""
+        for tag in tags:
+            content = content + tag.text + "\n"
+        #content = "\n".join().replace("<p>", "").replace("</p>", "")
+        print content
+        pos = soup2.text.rfind(u"收藏于")
+        time = soup2.text[pos + 4: pos + 14]
+        print time
         title = soup.title.string
         content.replace("&nbsp;", " ")
-        articles.append((title, content))
+        articles.append((title, content, time))
         #writerList.write("title:\n")
         #writerList.write(title.encode("utf-8"))
         #writerList.write(content.encode("utf-8"))

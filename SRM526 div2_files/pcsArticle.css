@@ -1,0 +1,26 @@
+/*! 7929 2015-3-2 14:58:22 */
+::-webkit-scrollbar-track:vertical,
+::-webkit-scrollbar-track:horizontal {background-color: #f3f1f0;}
+body {background-color: #fff;}
+#pcsArticle_ptkaiapt4bxy_baiduscarticle {width: 800px; word-break: break-all; word-wrap: break-word; padding: 0 1.5em; margin: 0 auto 2em;}
+.pcs-article-box_ptkaiapt4bxy_baiduscarticle .pcs-article-toos_ptkaiapt4bxy_baiduscarticle {font-family: Simsun,tahoma,Microsoft YaHei,Arial Unicode MS,Mingliu,Arial,Helvetica; border-top: 1px solid #e3dfde; border-bottom: 1px solid #e3dfde; padding: 2px 0 12px;}
+.pcs-article-box_ptkaiapt4bxy_baiduscarticle .pcs-article-toos_ptkaiapt4bxy_baiduscarticle .tags-list {margin: 10px 0 0;}
+.pcs-article-box_ptkaiapt4bxy_baiduscarticle .pcs-article-toos_ptkaiapt4bxy_baiduscarticle .tags-list li {font-size: 12px; display: inline; color: #93908e; margin: 0 0.7em 0 0;}
+.pcs-article-box_ptkaiapt4bxy_baiduscarticle .pcs-article-toos_ptkaiapt4bxy_baiduscarticle .note {font-size: 12px; margin: 10px 0 0; clear: both; color: #93908e; line-height: 1.5em;}
+.pcs-article-box_ptkaiapt4bxy_baiduscarticle {margin: 0 0 10em;}
+.pcs-article-title_ptkaiapt4bxy_baiduscarticle {margin: 108px 0 24px; word-break: break-all; font-size: 30px; font-weight: normal;}
+.pcs-article-c_ptkaiapt4bxy_baiduscarticle {font-size: 16px; line-height: 1.6em;}
+.pcs-article-c_ptkaiapt4bxy_baiduscarticle p,
+.pcs-article-c_ptkaiapt4bxy_baiduscarticle div {margin: 0 0 16px;}
+.pcs-article-c_ptkaiapt4bxy_baiduscarticle .pcs-article-content_ptkaiapt4bxy_baiduscarticle {margin: 32px 0 0;}
+.pcs-article-c_ptkaiapt4bxy_baiduscarticle .pcs-article-content_ptkaiapt4bxy_baiduscarticle a {color: #198ed8 !important; text-decoration: underline !important;}
+.pcs-article-content_ptkaiapt4bxy_baiduscarticle img {margin: 0; max-width: 100%; height: auto; -ms-interpolation-mode: bicubic;}
+.detail-article-content_ptkaiapt4bxy_baiduscarticle {margin: 2em 0 2em;}
+#detailArticleFooter_ptkaiapt4bxy_baiduscarticle {font-family: Simsun,tahoma,Microsoft YaHei,Arial Unicode MS,Mingliu,Arial,Helvetica; padding: 15px 0 50px; border-top: 1px solid #ddd; margin: 0 auto; color: #94918f;}
+#detailArticleFooter_ptkaiapt4bxy_baiduscarticle .link-src {margin: 10px 0 0; clear: both;}
+#detailArticleFooter_ptkaiapt4bxy_baiduscarticle .complaint {margin: 10px 0 0; clear: both;}
+#detailArticleFooter_ptkaiapt4bxy_baiduscarticle .add-ask-act {width: 1px; height: 1px; overflow: hidden;}
+#detailArticleFooter_ptkaiapt4bxy_baiduscarticle a:link,
+#detailArticleFooter_ptkaiapt4bxy_baiduscarticle a:visited {color: #198ed8;}
+#detailArticleFooter_ptkaiapt4bxy_baiduscarticle a:hover,
+#detailArticleFooter_ptkaiapt4bxy_baiduscarticle a:active {color: #198ed8; text-decoration: underline;}

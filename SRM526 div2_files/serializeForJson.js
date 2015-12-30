@@ -1,0 +1,2 @@
+/*! 1581 2013-9-17 14:8:14 */
+define(["lib/jquery/1_9"],function(e){return function(t){var n={};return e.each(t,function(){var e=this.name;e in n?n[e].push?n[e].push(this.value):n[e]=[n[e],this.value]:n[e]=this.value}),n}});
