@@ -15,7 +15,7 @@ def getArticleList():
     for content in contentList:
         s = 0
         while True:
-            pos = content.find("http://wenzhang.baidu.com/page/view?key", s)
+            pos = content.find("https://wenzhang.baidu.com/page/view?key", s)
             if pos == -1:
                 break
             ending = content.find("\"", pos)
