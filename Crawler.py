@@ -44,7 +44,7 @@ if __name__ == "__main__":
     #urls = ["http://wenzhang.baidu.com/page/view?key=168a2f0785435838-1426607065"]
     urls = getArticleList()
     articles = []
-    for url in urls:
+    for i, url in enumerate(urls):
         s = requests.Session()
         cookies = pyCookieCheat.chrome_cookies(url)
         res = s.get(url, cookies=cookies)
@@ -62,17 +62,18 @@ if __name__ == "__main__":
         for tag in tags:
             content = content + tag.text + "\n"
         #content = "\n".join().replace("<p>", "").replace("</p>", "")
-        print content
         pos = soup2.text.rfind(u"收藏于")
         time = soup2.text[pos + 4: pos + 14]
-        print time
         title = soup.title.string
         content.replace("&nbsp;", " ")
         articles.append((title, content, time))
-        #writerList.write("title:\n")
-        #writerList.write(title.encode("utf-8"))
-        #writerList.write(content.encode("utf-8"))
-    cPickle.dump(articles, open("articles.obj", "wb"))
-    #print title
-    #writerList.write(title.encode("utf-8"))
 
+        print i
+        print time
+        print title[1:-8]
+        #print content
+        writerList.write(title[1:-8].encode("utf-8") + '\n')
+        writerList.write(time + '\n\n')
+        writerList.write(content.encode("utf-8") + '\n\n')
+    cPickle.dump(articles, open("articles.obj", "wb"))
+    writerList.close()
