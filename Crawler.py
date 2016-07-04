@@ -8,6 +8,7 @@ import requests
 import pyCookieCheat
 from bs4 import BeautifulSoup
 import cPickle
+import re
 
 def getArticleList():
     contentList = open("wenzhang_full.html", "r").readlines()
@@ -39,41 +40,59 @@ def access1():
     print result.read()
 
 if __name__ == "__main__":
-    #url="http://wenzhang.baidu.com/page/view?key=168a2f0785435838-1426607065"
+    output2txt = False
+
+    #url="https://wenzhang.baidu.com/page/view?key=168a2f0785435838-1426607065"
     writerList = open("output.txt", "w")
-    #urls = ["http://wenzhang.baidu.com/page/view?key=168a2f0785435838-1426607065"]
+    #urls = ["https://wenzhang.baidu.com/page/view?key=168a2f0785435838-1426607065"]
     urls = getArticleList()
     articles = []
     for i, url in enumerate(urls):
+        # Set up conn and cookies
         s = requests.Session()
         cookies = pyCookieCheat.chrome_cookies(url)
         res = s.get(url, cookies=cookies)
-        #print res.raw.read(100000).decode("ISO-8859-1").encode("utf-8")
-        #print res.encoding
         res.encoding = "utf-8"
         soup = BeautifulSoup(res.text, 'html.parser')
-        #print soup.prettify()
+
         res2 = s.get(soup.body.iframe["src"], cookies = cookies)
         res2.encoding = "utf-8"
         soup2 = BeautifulSoup(res2.text, "html.parser")
-        #print soup2.prettify()
-        tags = soup2.body.div.find_all("p")
+
+        # Web scraping
+        title = soup.title.string[1:-8]
+        time_re = re.search(r'\d{4}-\d{2}-\d{2}', soup2.body.find('div', attrs={'class':'time-cang'}).string)
+        time = time_re.group(0) if time_re else '0000-00-00'
+
         content = ""
-        for tag in tags:
-            content = content + tag.text + "\n"
-        #content = "\n".join().replace("<p>", "").replace("</p>", "")
-        pos = soup2.text.rfind(u"收藏于")
-        time = soup2.text[pos + 4: pos + 14]
-        title = soup.title.string
+        tags = soup2.body.find('div', id='detailArticleContent_ptkaiapt4bxy_baiduscarticle').find_all('p')
+        if tags:
+            # case 1: newer articles (>2011) use <p> or <p><span> to make new paragraphs
+            for tag in tags:
+                content += tag.text.replace('\n', '') + '\n'
+        else:
+            # case 2: older baidu articles use <br> to make new paragraphs
+            for br in soup2.find_all('br'):
+                br.replace_with('\n')
+            content = soup2.body.find('div', id='detailArticleContent_ptkaiapt4bxy_baiduscarticle').text
+
         content.replace("&nbsp;", " ")
+
+        # Debugging
+        #print i
+        print title
+        print time
+        print content
+
         articles.append((title, content, time))
 
-        print i
-        print time
-        print title[1:-8]
-        #print content
-        writerList.write(title[1:-8].encode("utf-8") + '\n')
-        writerList.write(time + '\n\n')
-        writerList.write(content.encode("utf-8") + '\n\n')
+        # Write to text
+        if output2txt:
+            writerList.write(title.encode("utf-8") + '\n')
+            writerList.write(time + '\n\n')
+            writerList.write(content.encode("utf-8") + '\n\n')
+            writerList.write('+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+\n\n')
+
+    # Write to obj
     cPickle.dump(articles, open("articles.obj", "wb"))
     writerList.close()
