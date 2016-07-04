@@ -40,7 +40,7 @@ def access1():
     print result.read()
 
 if __name__ == "__main__":
-    output2txt = False
+    output2txt = True
 
     #url="https://wenzhang.baidu.com/page/view?key=168a2f0785435838-1426607065"
     writerList = open("output.txt", "w")
@@ -65,7 +65,8 @@ if __name__ == "__main__":
         time = time_re.group(0) if time_re else '0000-00-00'
 
         content = ""
-        tags = soup2.body.find('div', id='detailArticleContent_ptkaiapt4bxy_baiduscarticle').find_all('p')
+        content_div = soup2.body.find('div', id='detailArticleContent_ptkaiapt4bxy_baiduscarticle')
+        tags = content_div.find_all('p')
         if tags:
             # case 1: newer articles (>2011) use <p> or <p><span> to make new paragraphs
             for tag in tags:
@@ -74,15 +75,19 @@ if __name__ == "__main__":
             # case 2: older baidu articles use <br> to make new paragraphs
             for br in soup2.find_all('br'):
                 br.replace_with('\n')
-            content = soup2.body.find('div', id='detailArticleContent_ptkaiapt4bxy_baiduscarticle').text
+            content = content_div.text + '\n'
 
         content.replace("&nbsp;", " ")
+        # Appending content images to the end
+        for img in content_div.find_all('img'):
+            content += img['src'] + '\n'
 
         # Debugging
         #print i
         print title
-        print time
+        print time + '\n'
         print content
+        print '+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+\n\n'
 
         articles.append((title, content, time))
 
@@ -90,7 +95,7 @@ if __name__ == "__main__":
         if output2txt:
             writerList.write(title.encode("utf-8") + '\n')
             writerList.write(time + '\n\n')
-            writerList.write(content.encode("utf-8") + '\n\n')
+            writerList.write(content.encode("utf-8") + '\n')
             writerList.write('+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+\n\n')
 
     # Write to obj
