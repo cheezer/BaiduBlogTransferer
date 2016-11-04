@@ -2,13 +2,12 @@
 1. Save the html file of http://wenzhang.baidu.com/ as "wenzhang_full.html"
 
 2. Edit Crawler.py
-```
- You can choose :
+
+  You can choose :
  
- 1.Output to txt file
+   * Output to txt file
  
- 2.Output to Markdown file
-```
+   * Output to Markdown file
 
 3. Run Crawler.py
 
