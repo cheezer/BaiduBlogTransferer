@@ -122,18 +122,36 @@ def output2md():
             content_div = soup2.body.find('div', id='detailArticleContent_ptkaiapt4bxy_baiduscarticle')
             tags = content_div.find_all('img')
             now = content_div.prettify()
+            print title
             if tags:
                 for img in tags:
-                    print "Downloading"
+                    tmp =0
+                    print
+                    print "Downloading >>>" + img['src']
                     j = hashlib.md5(img['src']).hexdigest()
                     path = "images/" + j + ".jpg"
-                    data = urllib.urlretrieve(img['src'],path)
+                    try:
+                        data = urllib.urlretrieve(img['src'],path)
+                    except urllib2.HTTPError:
+                        print 'Bad URL'
+                        pass
+                    except IOError:
+                        print 'Bad URL'
+                        pass
+                    else:
+                        if (tmp <100):
+                            print 'Network conditions is not good.Reloading.'
+                            data = urllib.urlretrieve(img['src'],path)
+                        else:
+                            print 'Fail to get it' + img['src']
+                            pass
+                        tmp = tmp +1
+
                     print img['src'] + ">>>"+ path
                     now = now.replace(img['src'], path)
             content = now
             # Debugging
             #print i
-            print title
             print time + '\n'
             print content
             print '+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+\n\n'
