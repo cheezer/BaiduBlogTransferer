@@ -5,6 +5,7 @@ import urllib
 import urllib2
 import cookielib
 import requests
+import hashlib
 import pyCookieCheat
 from bs4 import BeautifulSoup
 import cPickle
@@ -38,66 +39,133 @@ def access1():
     gradeUrl = 'http://wenzhang.baidu.com/'
     result = opener.open(gradeUrl)
     print result.read()
+def output2txt():
+        writerList = open("output.txt", "w")
+        urls = getArticleList()
+        articles = []
+        for i, url in enumerate(urls):
+            # Set up conn and cookies
+            s = requests.Session()
+            cookies = pyCookieCheat.chrome_cookies(url)
+            res = s.get(url, cookies=cookies)
+            res.encoding = "utf-8"
+            soup = BeautifulSoup(res.text, 'html.parser')
 
-if __name__ == "__main__":
-    output2txt = True
+            res2 = s.get(soup.body.iframe["src"], cookies = cookies)
+            res2.encoding = "utf-8"
+            soup2 = BeautifulSoup(res2.text, "html.parser")
 
-    #url="https://wenzhang.baidu.com/page/view?key=168a2f0785435838-1426607065"
-    writerList = open("output.txt", "w")
-    #urls = ["https://wenzhang.baidu.com/page/view?key=168a2f0785435838-1426607065"]
-    urls = getArticleList()
-    articles = []
-    for i, url in enumerate(urls):
-        # Set up conn and cookies
-        s = requests.Session()
-        cookies = pyCookieCheat.chrome_cookies(url)
-        res = s.get(url, cookies=cookies)
-        res.encoding = "utf-8"
-        soup = BeautifulSoup(res.text, 'html.parser')
+            # Web scraping
+            title = soup.title.string[1:-8]
+            time_re = re.search(r'\d{4}-\d{2}-\d{2}', soup2.body.find('div', attrs={'class':'time-cang'}).string)
+            time = time_re.group(0) if time_re else '0000-00-00'
 
-        res2 = s.get(soup.body.iframe["src"], cookies = cookies)
-        res2.encoding = "utf-8"
-        soup2 = BeautifulSoup(res2.text, "html.parser")
+            content = ""
+            content_div = soup2.body.find('div', id='detailArticleContent_ptkaiapt4bxy_baiduscarticle')
+            tags = content_div.find_all('p')
+            if tags:
+                # case 1: newer articles (>2011) use <p> or <p><span> to make new paragraphs
+                for tag in tags:
+                    content += tag.text.replace('\n', '') + '\n'
+            else:
+                # case 2: older baidu articles use <br> to make new paragraphs
+                for br in soup2.find_all('br'):
+                    br.replace_with('\n')
+                content = content_div.text + '\n'
 
-        # Web scraping
-        title = soup.title.string[1:-8]
-        time_re = re.search(r'\d{4}-\d{2}-\d{2}', soup2.body.find('div', attrs={'class':'time-cang'}).string)
-        time = time_re.group(0) if time_re else '0000-00-00'
+            content.replace("&nbsp;", " ")
+            # Appending content images to the end
+            for img in content_div.find_all('img'):
+                content += img['src'] + '\n'
 
-        content = ""
-        content_div = soup2.body.find('div', id='detailArticleContent_ptkaiapt4bxy_baiduscarticle')
-        tags = content_div.find_all('p')
-        if tags:
-            # case 1: newer articles (>2011) use <p> or <p><span> to make new paragraphs
-            for tag in tags:
-                content += tag.text.replace('\n', '') + '\n'
-        else:
-            # case 2: older baidu articles use <br> to make new paragraphs
-            for br in soup2.find_all('br'):
-                br.replace_with('\n')
-            content = content_div.text + '\n'
+            # Debugging
+            #print i
+            print title
+            print time + '\n'
+            print content
+            print '+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+\n\n'
 
-        content.replace("&nbsp;", " ")
-        # Appending content images to the end
-        for img in content_div.find_all('img'):
-            content += img['src'] + '\n'
+            articles.append((title, content, time))
 
-        # Debugging
-        #print i
-        print title
-        print time + '\n'
-        print content
-        print '+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+\n\n'
-
-        articles.append((title, content, time))
-
-        # Write to text
-        if output2txt:
+            # Write to text
             writerList.write(title.encode("utf-8") + '\n')
             writerList.write(time + '\n\n')
             writerList.write(content.encode("utf-8") + '\n')
             writerList.write('+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+\n\n')
 
-    # Write to obj
-    cPickle.dump(articles, open("articles.obj", "wb"))
-    writerList.close()
+        # Write to obj
+        cPickle.dump(articles, open("articles.obj", "wb"))
+        writerList.close()
+# A function to download the aircles to a single markdown file
+# by Ivan
+def output2md():
+        urls = getArticleList()
+        articles = []
+        for i, url in enumerate(urls):
+            # Set up conn and cookies
+            s = requests.Session()
+            cookies = pyCookieCheat.chrome_cookies(url)
+            res = s.get(url, cookies=cookies)
+            res.encoding = "utf-8"
+            soup = BeautifulSoup(res.text, 'html.parser')
+
+            res2 = s.get(soup.body.iframe["src"], cookies = cookies)
+            res2.encoding = "utf-8"
+            soup2 = BeautifulSoup(res2.text, "html.parser")
+
+            # Web scraping
+            title = soup.title.string[1:-8]
+            time_re = re.search(r'\d{4}-\d{2}-\d{2}', soup2.body.find('div', attrs={'class':'time-cang'}).string)
+            time = time_re.group(0) if time_re else '0000-00-00'
+
+            content = ""
+            content_div = soup2.body.find('div', id='detailArticleContent_ptkaiapt4bxy_baiduscarticle')
+            tags = content_div.find_all('img')
+            now = content_div.prettify()
+            print title
+            if tags:
+                for img in tags:
+                    tmp =0
+                    print
+                    print "Downloading >>>" + img['src']
+                    j = hashlib.md5(img['src']).hexdigest()
+                    path = "images/" + j + ".jpg"
+                    try:
+                        data = urllib.urlretrieve(img['src'],path)
+                    except urllib2.HTTPError:
+                        print 'Bad URL'
+                        pass
+                    except IOError:
+                        print 'Bad URL'
+                        pass
+                    else:
+                        if (tmp <100):
+                            print 'Network conditions is not good.Reloading.'
+                            data = urllib.urlretrieve(img['src'],path)
+                        else:
+                            print 'Fail to get it' + img['src']
+                            pass
+                        tmp = tmp +1
+
+                    print img['src'] + ">>>"+ path
+                    now = now.replace(img['src'], path)
+            content = now
+            # Debugging
+            #print i
+            print time + '\n'
+            print content
+            print '+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+\n\n'
+
+            articles.append((title, content, time))
+
+            # Write to mardown with differnet files
+            writerList = open(time.encode("utf-8") + " " + title.encode("utf-8") +".md", "w")
+            writerList.write('# ' + title.encode("utf-8") + '\n\n')
+            writerList.write('> ' +time + '\n\n')
+            writerList.write(content.encode("utf-8") + '\n\n')
+            writerList.close()
+        # Write to obj
+        cPickle.dump(articles, open("articles.obj", "wb"))
+if __name__ == "__main__":
+    #output2txt()
+    output2md()
